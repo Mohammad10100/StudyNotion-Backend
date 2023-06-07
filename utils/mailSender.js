@@ -10,6 +10,15 @@ exports.mailSender = async (email, title, body)=>{
                 pass:process.env.MAIL_PASS,
             }
         });
+
+        let info = trasnporter.sendMail({
+            from:"StudyNotion",
+            to:email,
+            subject:title,
+            html:body,
+        })
+        console.log(info);
+        return info
         
     } catch (error) {
         console.log(error);
