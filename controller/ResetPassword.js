@@ -87,7 +87,7 @@ exports.ResetPasswordPage = async (req, res)=>{
         const hashedPassword = bcrypt.hash(password, 10);
 
         // update in db
-        const updatedResponse = await User.findOne({email:userDetails.email},{
+        const updatedResponse = await User.findOne({toke:tokenFromUser},{
             password:hashedPassword,
             token:null
         }, {new:true})
