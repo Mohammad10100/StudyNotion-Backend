@@ -90,9 +90,3 @@ exports.isAdmin= async(req, res, next)=>{
         })
     }
 }
-
-// is instructor 
-
-// is student 
-
-// is admin
