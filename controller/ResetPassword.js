@@ -3,7 +3,8 @@ const mailSender =require('../utils/mailSender')
 const bcrypt = require('bcrypt')
 
 // reset password through email link 
-exports.ResetPassword = async (req, res)=>{
+// genereate the token
+exports.resetPasswordToken = async (req, res)=>{
     try {
         // get email from body
         const {email} = req.body;
@@ -55,8 +56,8 @@ exports.ResetPassword = async (req, res)=>{
 }
 
 
-
-exports.ResetPasswordPage = async (req, res)=>{
+// after verification
+exports.resetPassword = async (req, res)=>{
     try {
         // get email from body
         const {password, confirmPassword, tokenFromUser} = req.body;

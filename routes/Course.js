@@ -3,11 +3,12 @@ const express = require("express")
 const router = express.Router()
 
 // Import the Controllers
-const { createCourse, getAllCourses, getCourseDetails, } = require("../controllers/Course");
-const { showAllCategories, createCategory, categoryPageDetails, } = require("../controllers/Category");
-const { createSection, updateSection, deleteSection} = require("../controllers/Section")
-const { createSubSection, updateSubSection, deleteSubSection, } = require("../controllers/Subsection")
-const { createRating, getAverageRating, getAllRating, } = require("../controllers/RatingAndReview")
+const { createCourse, showAllCourses, getCourseDetails, } = require("../controller/Course");
+const { showAllCategories, createCategory, getCategoryPageDetails, } = require("../controller/Category");
+const { createSection, updateSection, deleteSection} = require("../controller/Section")
+const { createSubSection, updateSubSection, deleteSubSection, } = require("../controller/SubSection")
+const { createRating, getAvgRating, getAllRatingReview, getReviewsByCourse }
+ = require("../controller/RatingAndReview")
 const { auth, isInstructor, isStudent, isAdmin } = require("../middleware/auth")
 
 
@@ -20,7 +21,7 @@ router.post("/deleteSection", auth, isInstructor, deleteSection)
 router.post("/updateSubSection", auth, isInstructor, updateSubSection)
 router.post("/deleteSubSection", auth, isInstructor, deleteSubSection)
 router.post("/addSubSection", auth, isInstructor, createSubSection)
-router.get("/getAllCourses", getAllCourses)
+router.get("/showAllCourses", showAllCourses)
 router.post("/getCourseDetails", getCourseDetails)
 
 
@@ -28,13 +29,14 @@ router.post("/getCourseDetails", getCourseDetails)
 // TODO: Put IsAdmin Middleware here
 router.post("/createCategory", auth, isAdmin, createCategory)
 router.get("/showAllCategories", showAllCategories)
-router.post("/getCategoryPageDetails", categoryPageDetails)
+router.post("/getCategoryPageDetails", getCategoryPageDetails)
 
 
 
 
 router.post("/createRating", auth, isStudent, createRating)
-router.get("/getAverageRating", getAverageRating)
+router.get("/getAverageRating", getAvgRating)
 router.get("/getReviews", getAllRatingReview)
+router.get("/getReviewsByCourse", getReviewsByCourse)
 
 module.exports = router

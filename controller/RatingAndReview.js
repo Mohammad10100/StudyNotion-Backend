@@ -136,7 +136,7 @@ exports.getAllRatingReview = async (req, res)=>{
 }
 
 
-exports.getAllRatingReviewsByCourse = async (req, res)=>{
+exports.getReviewsByCourse = async (req, res)=>{
     try {
         const {courseId} = await req.body;
         const ratingsOfCourse = await RatingAndReviews.find({course:courseId})
