@@ -19,7 +19,7 @@ exports.createSection = async (req,res)=>{
         const section = await Section.create({sectionName:sectionName})
 
         // push section in course
-        const updatedCourse = await Course.findByIdAndUpdate({courseId}, {
+        const updatedCourse = await Course.findByIdAndUpdate(courseId, {
             $push:{
                 courseContent:section._id
             }
@@ -34,6 +34,7 @@ exports.createSection = async (req,res)=>{
         })
         
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             messege: "Cannot create section, please try again",
@@ -55,7 +56,7 @@ exports.updateSection = async (req,res)=>{
                 error:error,
             })
         }
-        if (!await Section.findById({ sectionId })) {
+        if (!await Section.findById( sectionId )) {
             return res.status(400).json({
                 success: false,
                 messege: "section with this id does not exists",
@@ -63,7 +64,7 @@ exports.updateSection = async (req,res)=>{
         }
 
         // update section in db
-        const section = await Section.findByIdAndUpdate({sectionId},{sectionName:sectionName}, {new:true});
+        const section = await Section.findByIdAndUpdate(sectionId,{sectionName:sectionName}, {new:true});
         console.log(section);
 
         return res.status(200).json({
@@ -72,10 +73,10 @@ exports.updateSection = async (req,res)=>{
         })
         
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             messege: "Cannot update section, please try again",
-            error:error,
         })
     }
 }
@@ -86,7 +87,7 @@ exports.deleteSection = async (req,res)=>{
         // fetch details 
         // fetch id from params 
         // const {sectionId, courseId} = req.params or req.body;
-        const {sectionId} = req.params;
+        const {sectionId, courseId} = req.body
 
         // data validation 
         if(!sectionId){
@@ -97,24 +98,24 @@ exports.deleteSection = async (req,res)=>{
             })
         }
 
-        if (!await Section.findById({ sectionId })) {
+        if (!await Section.findById( sectionId )) {
             return res.status(400).json({
                 success: false,
                 messege: "Section with this id does not exists",
             })
         }
         // delete section from db
-        const section = await Section.findByIdAndDelete({sectionId})
+        const section = await Section.findByIdAndDelete(sectionId)
 
         // ToDo
         // pull (delete) section from course
-        // const updatedCourse = await Course.findByIdAndUpdate({courseId}, {
-        //     $pull:{
-        //         courseContent:section._id
-        //     }
-        // }, {new:true});
+        const updatedCourse = await Course.findByIdAndUpdate(courseId, {
+            $pull:{
+                courseContent:section._id
+            }
+        }, {new:true});
 
-        // console.log(updatedCourse);
+        console.log(updatedCourse);
 
 
         return res.status(200).json({

@@ -47,10 +47,11 @@ exports.updateProfile = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
     try {
         // fetch id 
+        console.log(req.user.id);
         const id = req.user.id;
 
         // check if user exists
-        const userDetails = await User.findById({ id })
+        const userDetails = await User.findById(id)
         if (!userDetails) {
             return res.status(404).json({
                 success: false,
@@ -63,8 +64,8 @@ exports.deleteAccount = async (req, res) => {
         // (that means he will not be able to pass another person's id)
 
         // delete profile 
-        const profileId= userDetails.accountType;
-        await Profile.findByIdAndDelete({profileId})
+        // const profileId= userDetails.;
+        await Profile.findByIdAndDelete(userDetails.additionalDetails)
 
         // TODO 
         // TODO 
@@ -73,20 +74,20 @@ exports.deleteAccount = async (req, res) => {
         // unroll user from all courses
 
         // IF THE USER IS TEACHER
-        // DO NOT DETAILS THE COURSES
+        // DO NOT DELETE THE COURSES
 
         // delete user from db
-        await User.findByIdAndDelete({id})
+        await User.findByIdAndDelete(id)
 
         return res.status(200).json({
             success: true,
             messege: "Account Deleted Successfully",
         })
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
-            messege: "Cannot update profile, please try again",
-            error: error,
+            messege: "Cannot delete profile, please try again",
         })
     }
 }

@@ -1,10 +1,14 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User')
 require('dotenv').config();
+require('cookie-parser')
 
 // auth 
 exports.auth=(req, res, next)=>{
     try {
-        const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ", "");
+        // const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ", "")
+        const token =  req.header("Authorization").replace("Bearer ", "");
+        // const token = req.cookies
 
         if(!token){
             return res.status(401).json({
@@ -23,6 +27,7 @@ exports.auth=(req, res, next)=>{
         }
         next();
     } catch (error) {
+        console.log(error);
         return res.status(401).json({
             success:false,
             messege:"Something went wrong while verifying the token"
@@ -32,8 +37,9 @@ exports.auth=(req, res, next)=>{
 
 exports.isStudent= async(req, res, next)=>{
     try {
-        console.log(req.user.role);
-        if(await User.findOne({email}).accountType!=='Student'){
+        console.log(req.user.accountType);
+        const user = await User.findOne({email:req.user.email})
+        if(user.accountType!=='Student'){
             return res.status(401).json({
                 success:false,
                 messege:"This is a protected route for students"
@@ -52,12 +58,11 @@ exports.isStudent= async(req, res, next)=>{
 
 exports.isInstructor= async(req, res, next)=>{
     try {
-        console.log(req.user.role);
-
-        if(await User.findOne({email}).accountType!=='Instructor'){
+        const user = await User.findOne({email:req.user.email})
+        if(user.accountType!=='Instructor'){
             return res.status(401).json({
                 success:false,
-                messege:"This is a protected route for admins"
+                messege:"This is a protected route for instructor"
             })
         }
         next();
@@ -73,9 +78,11 @@ exports.isInstructor= async(req, res, next)=>{
 
 exports.isAdmin= async(req, res, next)=>{
     try {
-        console.log(req.user.role);
+        // console.log(req.user);
 
-        if(await User.findOne({email}).accountType!=='Student'){
+        const userD=await User.findOne({email:req.user.email});
+        // console.log(userD.email,req.user.email) ;
+        if(userD.accountType!=='Admin'){
             return res.status(401).json({
                 success:false,
                 messege:"This is a protected route for admins"

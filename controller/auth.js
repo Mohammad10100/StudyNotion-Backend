@@ -1,4 +1,5 @@
 const User = require("../models/User")
+const Profile = require("../models/Profile")
 const OTP = require("../models/OTP")
 const otpGenerator = require("otp-generator")
 const bcrypt = require("bcrypt")
@@ -8,10 +9,12 @@ const jwt = require('jsonwebtoken')
 // sendOTP
 exports.sendOTP = async (req, res) => {
     try {
-        let { email } = req.body;
+        let {email} = req.body;
+        console.log(email);
 
         // if user already exists 
-        const exists = User.findOne({ email })
+        const exists = await User.findOne({ email })
+        console.log(exists);
 
         if (exists) {
             return res.status(401).json({
@@ -44,10 +47,9 @@ exports.sendOTP = async (req, res) => {
 
         // create an entry in DB
         const otpBody = await OTP.create(otpPayload);
-        console.log(otpBody);
 
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             messege: "OTP Generated and saved to DB successfully",
             otp,
@@ -56,7 +58,7 @@ exports.sendOTP = async (req, res) => {
 
     } catch (error) {
         console.log("error in sendOTP function of controller ", error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             messege: error.messege,
         })
@@ -91,7 +93,7 @@ exports.signUp = async (req, res) => {
         }
 
         //  check if user already exists
-        const exists = User.findOne({ email })
+        const exists = await User.findOne({ email })
         if (exists) {
             return res.status(401).json({
                 success: false,
@@ -101,7 +103,7 @@ exports.signUp = async (req, res) => {
 
         // check if confirm password matches
         if (password !== confirmPassword) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 messege: "Password and confirm password does not match, please try again"
             })
@@ -115,13 +117,16 @@ exports.signUp = async (req, res) => {
         console.log(recentOtp);
 
         if (recentOtp.length == 0) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 messege: "OTP Not found"
             })
-        } else if (otp !== recentOtp) {
+        }
+        console.log(otp, " " ,recentOtp[0].otp);
+        if (otp !== recentOtp[0].otp) {
+            console.log("invalid");
             // invalid otp
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 messege: "Invalid OTP"
             })
@@ -129,6 +134,7 @@ exports.signUp = async (req, res) => {
 
         // hash password
         const hashedPassword = await bcrypt.hash(password, 10)
+        console.log(hashedPassword);
 
         // entry in DB
         const profileDetails = await Profile.create({
@@ -137,7 +143,8 @@ exports.signUp = async (req, res) => {
             about: null,
             contactNumber: null,
         })
-
+        console.log(profileDetails);
+        
         const user = await User.create({
             firstName,
             lastName,
@@ -148,15 +155,16 @@ exports.signUp = async (req, res) => {
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
         })
-
-        res.status(200).json({
+        console.log(user);
+        
+        return res.status(200).json({
             success: true,
             messege: "Signed Up Successfully",
             user
         })
     } catch (error) {
         console.log("User cannot be regesterd, Please try again. Error in signUp controller ", error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             messege: error.messege,
         })
@@ -191,7 +199,7 @@ exports.login = async (req, res) => {
         const payload = {
             email: user.email,
             id: user._id,
-            role: user.role
+            accountType: user.accountType
         }
 
         if (await bcrypt.compare(password, user.password)) {
@@ -210,7 +218,7 @@ exports.login = async (req, res) => {
             }
 
             // testing the cookies 
-            res.cookie("token", token, options).status(200).json(
+            return res.cookie("token", token, options).status(200).json(
                 {
                     success: true,
                     token,
@@ -229,7 +237,7 @@ exports.login = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json(
+        return res.status(500).json(
             {
                 success: false,
                 data: "Login failed, please try again",
@@ -257,7 +265,7 @@ exports.changePassword = async (req, res) => {
             )
         }
         if (NewPass !== confirmPassword) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 messege: "Password and confirm password does not match, please try again"
             })
@@ -303,7 +311,7 @@ exports.changePassword = async (req, res) => {
             
 
             // return response
-            res.cookie("token", token, options).status(200).json(
+            return res.cookie("token", token, options).status(200).json(
                 {
                     success: true,
                     token,

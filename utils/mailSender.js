@@ -13,9 +13,9 @@ exports.mailSender = async (email, title, body)=>{
 
         let info = trasnporter.sendMail({
             from:"StudyNotion",
-            to:email,
-            subject:title,
-            html:body,
+            to:`${email}`,
+            subject: `${title}`,
+            html: `${body}`,
         })
         console.log(info);
         return info

@@ -29,7 +29,7 @@ router.post("/getCourseDetails", getCourseDetails)
 // TODO: Put IsAdmin Middleware here
 router.post("/createCategory", auth, isAdmin, createCategory)
 router.get("/showAllCategories", showAllCategories)
-router.post("/getCategoryPageDetails", getCategoryPageDetails)
+router.get("/getCategoryPageDetails", getCategoryPageDetails)
 
 
 

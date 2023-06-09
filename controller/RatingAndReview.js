@@ -10,7 +10,7 @@ exports.createRating = async (req, res) => {
         const { rating, review, courseId } = req.body;
 
         const courseDetails = await Course.findOne(
-            { _id: courseId, studentsEnrolled: { $elemMathc: { $eq: userId } } }
+            { _id: courseId, studentsEnrolled: { $elemMatch: { $eq: userId } } }
         )
 
         if (!courseDetails) {
@@ -55,10 +55,10 @@ exports.createRating = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             messege: `Error posting the review, please try again`,
-            error: error
         })
     }
 }

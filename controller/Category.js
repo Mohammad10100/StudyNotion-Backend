@@ -1,10 +1,13 @@
 const Category = require('../models/Category')
+const Course = require('../models/Course')
 
 // create category 
 exports.createCategory = async (req, res) => {
     try {
         // fetch data 
+        console.log('hhh');
         const { name, description } = req.body;
+        console.log(name, description);
 
         if (!name || !description) {
             return res.status(400).json({
@@ -40,6 +43,7 @@ exports.showAllCategories = async (req, res) => {
         console.log(allCategories);
         return res.status(200).json({
             success: true,
+            data:allCategories,
             messege: "Category fetched successfully"
         });
     } catch (error) {
@@ -68,21 +72,23 @@ exports.getCategoryPageDetails = async (req, res) => {
             });
         }
 
-        const differentCategoryCourses = await Category.findById({ _id: { $ne: categoryId } })
+        const differentCategoryCourses = await Category.find({ _id: { $ne: categoryId } })
             .populate('course')
             .exec()
 
-
+        
         // fetch top selling courses
         let courseWithTopSelling;
         try {
-            courseWithTopSelling = await Course.find({}, {studentsEnrolled: {$size: '$studentsEnrolled'}}, {new:true}).sort(['studentsEnrolled', -1]).limit(5);
+            courseWithTopSelling = await Course.find({}, {studentsEnrolled: {$size: '$studentsEnrolled'}}, {new:true})
+            .sort({studentsEnrolled: -1})
+            .limit(5)
         } catch (error) {
-            console.log(error in courseWithTopSelling);
+            console.log('error in courseWithTopSelling');
         }
 
         
-        return es.status(200).json({
+        return res.status(200).json({
             success: true,
             data:{                
                 coursesOfCategrory,
