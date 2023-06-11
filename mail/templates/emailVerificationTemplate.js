@@ -1,5 +1,5 @@
 const otpTemplate = (otp) => {
-	return `<!DOCTYPE html>
+	return (`<!DOCTYPE html>
 	<html>
 	
 	<head>
@@ -7,7 +7,7 @@ const otpTemplate = (otp) => {
 		<title>OTP Verification Email</title>
 		<style>
 			body {
-				background-color: #ffffff;
+
 				font-family: Arial, sans-serif;
 				font-size: 16px;
 				line-height: 1.4;
@@ -82,6 +82,6 @@ const otpTemplate = (otp) => {
 		</div>
 	</body>
 	
-	</html>`;
+	</html>`);
 };
 module.exports = otpTemplate;
