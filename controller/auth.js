@@ -14,7 +14,7 @@ exports.sendOTP = async (req, res) => {
 
         // if user already exists 
         const exists = await User.findOne({ email })
-        console.log(exists);
+        // console.log(exists);
 
         if (exists) {
             return res.status(401).json({
@@ -52,7 +52,8 @@ exports.sendOTP = async (req, res) => {
         return res.status(200).json({
             success: true,
             messege: "OTP Generated and saved to DB successfully",
-            otp,
+            // otp, 
+            // do not send any otp data in response, it cam be viewed in through frontend 
         })
 
 
@@ -134,7 +135,6 @@ exports.signUp = async (req, res) => {
 
         // hash password
         const hashedPassword = await bcrypt.hash(password, 10)
-        console.log(hashedPassword);
 
         // entry in DB
         const profileDetails = await Profile.create({
@@ -155,6 +155,8 @@ exports.signUp = async (req, res) => {
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
         })
+
+        user.password = undefined
         console.log(user);
         
         return res.status(200).json({
