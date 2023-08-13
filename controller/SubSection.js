@@ -7,11 +7,11 @@ exports.createSubSection = async (req, res) => {
 
         // fetch details 
         const { sectionId, title, timeDuration, description } = req.body;
-
+        console.log(req.body);
         // extract video file
         const video = req.files.video;
         // validate
-        if (!sectionId || !title || !timeDuration || !description) {
+        if (!sectionId || !title || !description) {
             return res.status(400).json({
                 success: false,
                 messege: "All fields are mandatory",
@@ -50,6 +50,7 @@ exports.createSubSection = async (req, res) => {
         return res.status(200).json({
             success: true,
             messege: "Sub section created successfully",
+            data:updatedSection
         })
     } catch (error) {
         console.log(error);
@@ -67,33 +68,47 @@ exports.createSubSection = async (req, res) => {
 exports.updateSubSection = async (req, res) => {
     try {
         // fetch details 
-        const { subSectionId, title, timeDuration, description } = req.body;
+        const { sectionId, subSectionId, title, description } = req.body;
+        console.log('logging req update subs',req.body);
 
         // thought??
         // const toUpdate={}
         // if(title){toUpdate.title=title}
         // if(timeDuration){toUpdate.timeDuration=timeDuration}
         // if(description){toUpdate.description=description}
-
         // validate 
-        if (!subSectionId || !title || !timeDuration || !description) {
+        if (!subSectionId || (!title && !description)) {
             return res.status(400).json({
                 success: false,
                 messege: "Missing property",
             })
         }
-        if (!await SubSection.findById({ subSectionId })) {
+        if (!await SubSection.findById(subSectionId)) {
             return res.status(400).json({
                 success: false,
                 messege: "SubSection with this id does not exists",
             })
         }
         // update in db
-        const updatedSubSection = await SubSection.findByIdAndUpdate({ subSectionId }, {
-            title: title,
-            timeDuration: timeDuration,
-            description: description
-        }, { new: true })
+        let updateSub={
+        }
+        if(title){updateSub.title=title}
+        if(description){updateSub.description=description}
+        let updatedSubSection = null
+        try {
+            updatedSubSection = await SubSection.findByIdAndUpdate(subSectionId, updateSub,
+            { new: true })
+        } catch (error) {
+            return res.status(503).json({
+                success: false,
+                messege: "error in updating subseciton",
+                error: error,
+            })
+        }
+
+        let updatedSection = await Section.findById(sectionId)
+        .populate("subSection")
+        .exec();
 
         // delete video from cloudinary
         // TODO 
@@ -102,6 +117,7 @@ exports.updateSubSection = async (req, res) => {
         return res.status(200).json({
             success: true,
             messege: "Sub section updated successfully",
+            data:updatedSection
         })
     } catch (error) {
         return res.status(500).json({
@@ -115,9 +131,7 @@ exports.updateSubSection = async (req, res) => {
 exports.deleteSubSection = async (req, res) => {
     try {
         // fetch details 
-        // const { subSectionId, sectionId } = req.body;
-        const { subSectionId } = req.params;
-
+        const { subSectionId, sectionId } = req.body;
         // validate 
         if (!subSectionId) {
             return res.status(400).json({
@@ -126,7 +140,7 @@ exports.deleteSubSection = async (req, res) => {
             })
         }
 
-        if (!await subSectionId.findById({ subSectionId })) {
+        if (!await SubSection.findById(subSectionId )) {
             return res.status(400).json({
                 success: false,
                 messege: "SubSection with this id does not exists",
@@ -134,10 +148,12 @@ exports.deleteSubSection = async (req, res) => {
         }
 
         // delete from db
-        await SubSection.findByIdAndDelete({subSectionId});
+        await SubSection.findByIdAndDelete(subSectionId);
 
         // ToDo
         // pull (delete) section from course
+        const updatedSection = await Section.findById(sectionId).populate("subSection")
+        // ???
         // const updatedSection = await Section.findByIdAndUpdate({sectionId}, {
         //     $pull:{
         //         subSection:subSectionId
@@ -149,6 +165,7 @@ exports.deleteSubSection = async (req, res) => {
         return res.status(200).json({
             success: true,
             messege: "Subsection deleted successfully",
+            data:updatedSection
         })
 
     } catch (error) {

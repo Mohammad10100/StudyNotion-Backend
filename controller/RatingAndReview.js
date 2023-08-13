@@ -9,10 +9,12 @@ exports.createRating = async (req, res) => {
 
         const { rating, review, courseId } = req.body;
 
-        const courseDetails = await Course.findOne(
-            { _id: courseId, studentsEnrolled: { $elemMatch: { $eq: userId } } }
-        )
-
+        const courseDetails = await Course.findById(
+            // {
+                courseId
+            // studentsEnrolled: {$elemMatch: {$eq: userId} },
+        // }
+        );
         if (!courseDetails) {
             return res.status(404).json({
                 success: false,
@@ -21,26 +23,36 @@ exports.createRating = async (req, res) => {
             })
         }
 
+        const enrolledStudArray = Object.values(courseDetails.studentsEnrolled);
+        let isEnrolled = enrolledStudArray.find(element => element = userId)
+        if(!isEnrolled){
+            return res.status(404).json({
+                success: false,
+                messege: `Student is not enrolled in the course ${courseId}`,
+
+            })
+        }
+
         const alreadyReviewd = await RatingAndReviews.findOne({
-            _id: userId,
+            user: userId,
             course: courseId,
         })
         if (alreadyReviewd) {
             return res.status(200).json({
                 success: false,
                 messege: `User already reviewed this course`,
-
+                
             })
         }
-
+        
         const ratingReview = await RatingAndReviews.create({
             user: userId,
             course: courseId,
             rating: rating,
             review: review
         })
-
-        const updatedCourseDetails = await Course.findByIdAndUpdate({ courseId }, {
+        
+        const updatedCourseDetails = await Course.findByIdAndUpdate( courseId , {
             $push: {
                 ratingAndReviews: ratingReview._id
             }

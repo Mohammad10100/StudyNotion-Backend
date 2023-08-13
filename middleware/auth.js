@@ -7,7 +7,8 @@ require('cookie-parser')
 exports.auth=(req, res, next)=>{
     try {
         // const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ", "")
-        const token =  req.header("Authorization").replace("Bearer ", "");
+        let token =  req.header("Authorization").replace("Bearer ", "");
+        // console.log(token);
         // const token = req.cookies
 
         if(!token){

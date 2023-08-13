@@ -10,11 +10,9 @@ const jwt = require('jsonwebtoken')
 exports.sendOTP = async (req, res) => {
     try {
         let {email} = req.body;
-        console.log(email);
 
         // if user already exists 
         const exists = await User.findOne({ email })
-        // console.log(exists);
 
         if (exists) {
             return res.status(401).json({
@@ -115,7 +113,6 @@ exports.signUp = async (req, res) => {
 
         // find most recent otp for that account 
         const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-        console.log(recentOtp);
 
         if (recentOtp.length == 0) {
             return res.status(400).json({
@@ -143,7 +140,6 @@ exports.signUp = async (req, res) => {
             about: null,
             contactNumber: null,
         })
-        console.log(profileDetails);
         
         const user = await User.create({
             firstName,
@@ -157,7 +153,6 @@ exports.signUp = async (req, res) => {
         })
 
         user.password = undefined
-        console.log(user);
         
         return res.status(200).json({
             success: true,
@@ -208,14 +203,14 @@ exports.login = async (req, res) => {
             let token = jwt.sign(
                 payload,
                 process.env.JWT_SECRET,
-                { expiresIn: '2h' }
+                { expiresIn: '3d' }
             )
             user = user.toObject()
             user.token = token;
             user.password = undefined;
 
             const options = {
-                expiresIn: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
                 httpOnly: true,
             }
 
@@ -300,7 +295,7 @@ exports.changePassword = async (req, res) => {
             let token = jwt.sign(
                 payload,
                 process.env.JWT_SECRET,
-                { expiresIn: '2h' }
+                { expiresIn: '3d' }
             )
             user = user.toObject()
             user.token = token;

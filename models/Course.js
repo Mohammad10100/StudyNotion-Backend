@@ -15,6 +15,10 @@ const courseSchema = new mongoose.Schema(
             ref:"User",
             require:true,
         },
+        instructions:{
+            type:Array,
+            require:true,
+        },
         whatYouWillLearn:{
             type:String,
         },
@@ -53,7 +57,11 @@ const courseSchema = new mongoose.Schema(
         status:{
             type:String,
             enum:['Draft', 'Published']
-        }
+        },
+        createdAt: {
+            type:Date,
+            default:Date.now
+        },
     }
 )
 
