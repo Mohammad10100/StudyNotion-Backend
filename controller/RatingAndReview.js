@@ -135,7 +135,7 @@ exports.getAllRatingReview = async (req, res)=>{
         
 
         return res.status(200).json({
-            success: false,
+            success: true,
             allRatings:allRatings,
             messege:"Fetched all the reviews",
         })
